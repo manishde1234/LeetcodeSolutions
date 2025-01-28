@@ -28,6 +28,24 @@ public:
         }
         return maxCount; 
     }
+
+    int dfs(int i,int j, int m, int n, vector<vector<int>>& grid){
+        if(i < 0 || i >= m || j < 0 || j >= n || grid[i][j] == 0){
+            return 0;
+        }
+        int maxCount = grid[i][j];
+        grid[i][j] = 0;
+
+        for(auto& dir: directions){
+            int i_ = i + dir[0];
+            int j_ = j + dir[1];
+
+            maxCount += dfs(i_,j_,m,n,grid);
+        }
+
+        return maxCount;
+    }
+
     int findMaxFish(vector<vector<int>>& grid) {
         int m = grid.size();
         int n = grid[0].size();
@@ -36,7 +54,7 @@ public:
         for(int i = 0; i < m; i++){
             for(int j = 0; j < n; j++){
                 if(grid[i][j] > 0){
-                    maxFishCount = max(maxFishCount,bfs(i,j,m,n,grid));
+                    maxFishCount = max(maxFishCount,dfs(i,j,m,n,grid));
                 }
             }
         }
