@@ -1,40 +1,56 @@
 class Solution {
 public:
-    vector<int> findRedundantConnection(vector<vector<int>>& edges) {
-        unordered_map<int, vector<int>> graph;
+    bool bfs(int u, int v, unordered_map<int,vector<int>> &adj,
+        vector<vector<int>>& edges){
 
-        auto isConnected = [&](int u, int v) {
-            unordered_set<int> visited;
-            stack<int> stack;
-            stack.push(u);
+        int n = edges.size();
+        vector<bool>visited(n+1); // so that everynode has same idx
+        queue<int>que;
+        que.push(u);
+        
 
-            while (!stack.empty()) {
-                int node = stack.top();
-                stack.pop();
-
-                if (visited.count(node)) continue;
-                visited.insert(node);
-
-                if (node == v) return true;
-
-                for (int neighbor : graph[node]) {
-                    stack.push(neighbor);
+        while(!que.empty()){
+            int node = que.front();
+            que.pop();
+            visited[node] = true;
+            if(node == v){
+                return true;
+            }
+            for(auto v_:adj[node]){
+                if(!visited[v_]){
+                    que.push(v_);
+                    
                 }
+
             }
-            return false;
-        };
-
-        for (const auto& edge : edges) {
-            int u = edge[0], v = edge[1];
-
-            if (graph.count(u) && graph.count(v) && isConnected(u, v)) {
-                return edge;
-            }
-
-            graph[u].push_back(v);
-            graph[v].push_back(u);
         }
+        return false;
 
-        return {};
+    }
+    vector<int> findRedundantConnection(vector<vector<int>>& edges) {
+        //make the graph
+        //while that check if both vertex are connected
+        //return the vertexes
+        int n = edges.size();
+        unordered_map<int,vector<int>> adj;
+
+        for(int i = 0; i < n; i++){
+          
+                int u = edges[i][0];
+                int v = edges[i][1];
+
+                if(adj.find(u) != adj.end() && adj.find(v) != adj.end()
+                 && bfs(u,v,adj,edges)){
+                    return{u,v};
+                }
+
+                //if not then add it in the graph
+                adj[u].push_back(v);
+                adj[v].push_back(u);
+            }
+
+            return {};
+        
+
     }
 };
