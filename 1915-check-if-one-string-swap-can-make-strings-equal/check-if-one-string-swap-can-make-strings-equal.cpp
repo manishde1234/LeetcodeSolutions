@@ -27,9 +27,7 @@ public:
                 }
             }
         }
-        if(count == 1){
-            return false;
-        }
+      
         return s1[firstidx] == s2[secondidx] && s2[firstidx] == s1[secondidx];
     }
 };
