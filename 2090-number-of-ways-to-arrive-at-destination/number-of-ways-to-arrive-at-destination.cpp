@@ -1,41 +1,52 @@
 class Solution {
 public:
+    typedef long long ll;
+    typedef pair<ll,int> P;
+    int M = 1e9+7;
     int countPaths(int n, vector<vector<int>>& roads) {
-        vector<vector<pair<int, int>>> graph(n);
-        for (const auto& road : roads) {
-            int u = road[0], v = road[1], time = road[2];
-            graph[u].emplace_back(v, time);
-            graph[v].emplace_back(u, time);
+        //create adjacency list
+        unordered_map<int,vector<P>> adj(n);
+
+        for(auto &road : roads){
+            int u = road[0];
+            int v = road[1];
+            int wt = road[2];
+
+            adj[u].push_back({v,wt});
+            adj[v].push_back({u,wt});
         }
 
-        vector<long long> dist(n, LLONG_MAX);
-        vector<int> ways(n, 0);
+        vector<ll>result(n,LLONG_MAX);
+        vector<int>count(n,0);
 
-        dist[0] = 0;
-        ways[0] = 1;
+        result[0] = 0;
+        count[0] = 1;
 
-        priority_queue<pair<long long, int>, vector<pair<long long, int>>, greater<>> pq;
-        pq.emplace(0, 0);
+        priority_queue<P, vector<P>, greater<P>>pq;
+        pq.push({0,0});//dist , node
 
-        const int MOD = 1e9 + 7;
-
-        while (!pq.empty()) {
-            auto [d, node] = pq.top();
+        while(!pq.empty()){
+            int node = pq.top().second;
+            ll dist = pq.top().first;
             pq.pop();
 
-            if (d > dist[node]) continue;
+            for(auto &vec: adj[node]){
+                int adjnode = vec.first;
+                ll wt = vec.second;
 
-            for (const auto& [neighbor, time] : graph[node]) {
-                if (dist[node] + time < dist[neighbor]) {
-                    dist[neighbor] = dist[node] + time;
-                    ways[neighbor] = ways[node];
-                    pq.emplace(dist[neighbor], neighbor);
-                } else if (dist[node] + time == dist[neighbor]) {
-                    ways[neighbor] = (ways[neighbor] + ways[node]) % MOD;
+                if(dist + wt < result[adjnode]){
+                    result[adjnode] = dist + wt;
+                    pq.push({dist+wt, adjnode});
+                    count[adjnode] = count[node];//count of the prev node
+                }
+
+                else if(dist + wt == result[adjnode]){
+                    count[adjnode] = (count[adjnode] + count[node]) % M;
                 }
             }
         }
 
-        return ways[n - 1];
+        return count[n-1];
+
     }
 };
