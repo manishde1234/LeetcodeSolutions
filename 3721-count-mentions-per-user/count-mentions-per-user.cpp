@@ -87,7 +87,7 @@ public:
             if(t1 == t2){
                 //offline first
                 cout << vec1[0][0] << " vec2" << vec1[0][1];
-                return vec1[0][1] > vec2[0][1];
+                return vec1[0][0] > vec2[0][0];
             }
             return t1 < t2;
         };
@@ -96,6 +96,7 @@ public:
 
         //simulation
         for(auto &event: events){
+             cout << event[0][0] << " vec2 " << event[0][1];
             if(event[0] == "MESSAGE"){
                 
                 // applymessage(mentions, offlineUsers, event);
