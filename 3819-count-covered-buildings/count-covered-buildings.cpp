@@ -1,33 +1,46 @@
-const int SZ=100001;
-int xMin[SZ], xMax[SZ], yMin[SZ], yMax[SZ];
 class Solution {
 public:
-    static int countCoveredBuildings(int n, vector<vector<int>>& buildings) {
-        int M=0, N=0;
-        for(auto& B: buildings){
-            const int x=B[0], y=B[1];
-            M=max(x, M);
-            N=max(y, N);
-        }
-        memset(xMax, 0, sizeof(int)*(N+1));
-        memset(yMax, 0, sizeof(int)*(M+1));
-        fill(xMin, xMin+(N+1), INT_MAX);
-        fill(yMin, yMin+(M+1), INT_MAX);
+    int countCoveredBuildings(int n, vector<vector<int>>& buildings) {
+        //create 2 map for storing the values
+        unordered_map<int,pair<int,int>>xToMinMaxY;
+        unordered_map<int,pair<int,int>>yToMinMaxX;
 
-        for(auto& B: buildings){
-            const int x=B[0], y=B[1];
-            xMin[y]=min(xMin[y], x);
-            xMax[y]=max(xMax[y], x);
-            yMin[x]=min(yMin[x], y);
-            yMax[x]=max(yMax[x], y);
+        //first for loop for populating the map
+        for(auto &building: buildings){
+            int x = building[0];
+            int y = building[1];
+
+            if(!xToMinMaxY.count(x)){
+                xToMinMaxY[x] = {INT_MAX,INT_MIN};
+            }
+
+            if(!yToMinMaxX.count(y)){
+                yToMinMaxX[y] = {INT_MAX,INT_MIN};
+            }
+
+            //set the values
+            xToMinMaxY[x] = {min(xToMinMaxY[x].first, y),
+             max(xToMinMaxY[x].second,y)};
+
+            yToMinMaxX[y] = {min(yToMinMaxX[y].first,x),
+             max(yToMinMaxX[y].second,x)};
         }
-        int cnt=0;
-        for(auto& B: buildings){
-            const int x=B[0], y=B[1];
-            const bool coverX=(xMin[y]<x & x<xMax[y]);
-            const bool coverY=(yMin[x]<y & y<yMax[x]);
-            cnt+=(coverX & coverY);
+
+        //now compare the values
+        int count = 0;
+        for(auto &building: buildings){
+            int x = building[0];
+            int y = building[1];
+
+            auto &xmap = xToMinMaxY[x];
+            auto &ymap = yToMinMaxX[y];
+
+            if(xmap.first < y  && y < xmap.second &&
+                ymap.first < x && x < ymap.second){
+                count++;
+            }
         }
-        return cnt;
+
+        return count;
     }
 };
